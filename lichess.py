@@ -62,7 +62,7 @@ def get_challenges(url):
                     #accept if not about to play a new game.
                     if msg['challenge']['variant']['key']!="standard":
                         r=requests.post(url_challenge+msg['challenge']['id']+"/decline",auth=token)
-                    elif msg['challenge']['speed']!="blitz" and msg['challenge']['speed']!="rapid":
+                    elif msg['challenge']['speed']!="blitz" and msg['challenge']['speed']!="rapid" and msg['challenge']['speed']!="bullet":
                         r=requests.post(url_challenge+msg['challenge']['id']+"/decline",auth=token)
                     else:
                         r=requests.post(url_challenge+msg['challenge']['id']+"/accept",auth=token)
@@ -140,9 +140,13 @@ def game_stream(ID):
                         if side==0: t=msg['wtime']
                         else: t=msg['btime']
                         t=math.floor(t/1000)
-                        print(t)
-                        if t<=30: depth=2
-                        else: depth=3
+
+                        if (side==0 and msg['winc']==0) or (side==1 and msg['binc']==0):
+                            if t<=40: depth=2
+                            else: depth=3
+                        else:
+                            if t<=30: depth=2
+                            else: depth=3
                         m=b.pcmove(depth)
                         a=lets[m[0][0]]+str(m[0][1]+1)+lets[m[1][0]]+str(m[1][1]+1)
                         if len(m)==4: a+=pieces[m[3]]
